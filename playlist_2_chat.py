@@ -10,10 +10,8 @@ URL = 'https://www.googleapis.com/youtube/v3/'
 #ENTER YOUTUBE APIKEY HERE
 API_KEY = '';
 
-videos = [];
-
 try:
-  def playlist_2_URLs(id: str, next_page_token) -> None:   
+  def playlist_2_URLs(id: str, next_page_token) -> list:
       params = {
         'key': API_KEY,
         'part': 'snippet',
@@ -26,6 +24,9 @@ try:
         params['pageToken'] = next_page_token
       response = requests.get(URL + 'playlistItems', params=params)
       resource = response.json()
+
+      videos = [];
+
       try:
         assert "error" not in resource;
       except:
@@ -41,11 +42,12 @@ try:
         playlist_2_URLs(id, resource["nextPageToken"]);
 
       os.system("cls");
+      return videos;
 
-  def chatDownloadStarter(filename: str) -> None:
+  def chatDownloadStarter(videos: list, filename: str) -> None:
     with open(filename + ".txt", mode="w", encoding="utf-8") as f:
       for video_id in videos:
-        f.write(video_id);
+        f.write(video_id + "\n");
         all_messages = chatDownload(video_id = video_id);
         f.write(all_messages);
         f.flush();
@@ -61,21 +63,23 @@ try:
         ret+= "\t" + line + "\n";
       
       return ret;
-    except:
-      print("Something went wrong.");
+    except Exception as e:
+      print(e);
     return "";
 
   def main():
     playlistID = input("input playlist URL.");
     print("Thank you.");
     playlistID = playlistID.split("?list=")[-1];
-    playlist_2_URLs(id = playlistID, next_page_token = None);
-    chatDownloadStarter(filename=playlistID);
+    videos = playlist_2_URLs(id = playlistID, next_page_token = None);
+    chatDownloadStarter(videos=videos, filename=playlistID);
     print("Done.")
     input("Press Enter to Exit.");
 
   if __name__ == "__main__":
     while True:
       main();
-except Error:
-  input("Somewhere in the code raised {}. Press Enter to Exit".format(Error));
+
+except Exception as e:
+  print(e);
+  input("Press Enter to Exit");
