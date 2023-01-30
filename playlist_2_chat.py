@@ -75,6 +75,7 @@ try:
     input("Press Enter to Exit.");
 
   if __name__ == "__main__":
-    main();
+    while True:
+      main();
 except Error:
   input("Somewhere in the code raised {}. Press Enter to Exit".format(Error));
